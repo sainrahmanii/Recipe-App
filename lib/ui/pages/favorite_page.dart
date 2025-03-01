@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:receipt_app/services/remote/remote_service.dart';
+import 'package:receipt_app/services/local/local_service.dart';
 import 'package:receipt_app/ui/pages/detail_page.dart';
-import 'package:receipt_app/ui/pages/favorite_page.dart';
 import 'package:receipt_app/ui/widgets/item_meal_widget.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class FavoritePage extends StatefulWidget {
+  const FavoritePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<FavoritePage> createState() => _FavoritePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _FavoritePageState extends State<FavoritePage> {
   int currentIndex = 0;
 
   @override
@@ -19,32 +18,18 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          currentIndex == 0 ? 'List Seafood' : 'List Dessert',
+          currentIndex == 0 ? "Your Favorite Seafood" : "Your Favorite Dessert",
           style: TextStyle(
             fontFamily: 'Plus Jakarta Sans',
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FavoritePage(),
-                ),
-              );
-            },
-            icon: Icon(Icons.favorite_rounded),
-            color: Colors.red,
-          )
-        ],
       ),
       body: Center(
         child: FutureBuilder(
-          future: RemoteService()
-              .getMealsByCategory(currentIndex == 0 ? 'Seafood' : 'Dessert'),
+          future: LocalService()
+              .getAllFavByCategory(currentIndex == 0 ? 'Seafood' : 'Dessert'),
           builder: (context, snapshot) {
             // Loading
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,19 +42,20 @@ class _HomePageState extends State<HomePage> {
             }
 
             // Success
-            final listMeal = snapshot.data!.meals;
+            final listMeal = snapshot.data!;
             return ListView.builder(
               itemCount: listMeal.length,
               itemBuilder: (BuildContext context, int index) {
                 final itemMeal = listMeal[index];
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => DetailPage(id: itemMeal.idMeal),
                       ),
                     );
+                    setState(() {});
                   },
                   child: ItemMealWidgets(meal: itemMeal),
                 );

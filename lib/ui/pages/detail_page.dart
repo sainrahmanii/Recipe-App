@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:receipt_app/models/meal.dart';
-import 'package:receipt_app/models/response_meals.dart';
+import 'package:receipt_app/services/local/local_service.dart';
 import 'package:receipt_app/services/remote/remote_service.dart';
 
 class DetailPage extends StatefulWidget {
@@ -22,8 +22,14 @@ class _DetailPageState extends State<DetailPage> {
       _isLoading = true;
     });
 
-    final response = await RemoteService().getDetailsMeal(widget.id);
-    meal = response.meals.first;
+    _isFavorited = await LocalService().isFavorited(widget.id);
+
+    if (_isFavorited) {
+      meal = await LocalService().getFavoriteMeal(widget.id);
+    } else {
+      final response = await RemoteService().getDetailsMeal(widget.id);
+      meal = response.meals.first;
+    }
 
     setState(() {
       _isLoading = false;
@@ -43,7 +49,15 @@ class _DetailPageState extends State<DetailPage> {
         title: Text("Detail Page"),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
+              if (_isLoading) return;
+              if (_isFavorited) {
+                // delete data
+                await LocalService().delete(meal.idMeal);
+              } else {
+                // add data
+                await LocalService().insert(meal);
+              }
               setState(() {
                 _isFavorited = !_isFavorited;
               });

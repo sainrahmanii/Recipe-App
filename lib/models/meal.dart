@@ -21,11 +21,22 @@ class Meal {
         strInstructions: json["strInstructions"],
       );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
         "strMeal": strMeal,
         "strMealThumb": strMealThumb,
         "idMeal": idMeal,
         "strCategory": strCategory,
         "strInstructions": strInstructions,
       };
+}
+
+const String tableName = "favoriteMeal";
+
+class MealFields {
+  static const String id = "_id";
+  static const String idMeal = "idMeal";
+  static const String strMeal = "strMeal";
+  static const String strInstructions = "strInstructions";
+  static const String strCategory = "strCategory";
+  static const String strMealThumb = "strMealThumb";
 }

@@ -23,6 +23,6 @@ class ResponseMeals {
       );
 
   Map<String, dynamic> toJson() => {
-        "meals": List<dynamic>.from(meals.map((x) => x.toJson())),
+        "meals": List<dynamic>.from(meals.map((x) => x.toMap())),
       };
 }
